@@ -1,0 +1,103 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  back-dnd
+
+Globals:
+  Function:
+    Timeout: 30
+    Runtime: nodejs18.x
+
+Resources:
+  GetUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/handlers/users/index.getUser
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          MONGODB_URI: !Sub '{{resolve:ssm:mongo-url}}'
+          JWT_SECRET: !Sub '{{resolve:ssm:jwt-secret}}'
+      Events:
+        GetUserApi:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: GET
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/handlers/users/index.ts
+        External:
+          - aws-sdk
+        Minify: false
+        Sourcemap: false
+        Target: "es2020"
+        Format: "cjs"
+
+  CreateUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/handlers/users/index.createUser
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          MONGODB_URI: !Sub '{{resolve:ssm:mongo-url}}'
+          JWT_SECRET: !Sub '{{resolve:ssm:jwt-secret}}'
+      Events:
+        CreateUserApi:
+          Type: Api
+          Properties:
+            Path: /users
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/handlers/users/index.ts
+        External:
+          - aws-sdk
+        Target: es2020
+        Format: cjs
+        Minify: false
+
+  LoginFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: src/handlers/auth/index.login
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          MONGODB_URI: !Sub '{{resolve:ssm:mongo-url}}'
+          JWT_SECRET: !Sub '{{resolve:ssm:jwt-secret}}'
+      Events:
+        LoginApi:
+          Type: Api
+          Properties:
+            Path: /login
+            Method: POST
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        EntryPoints:
+          - src/handlers/auth/index.ts
+        External:
+          - aws-sdk
+        Target: es2020
+        Format: cjs
+        Minify: false
+
+Outputs:
+  ApiUrl:
+    Description: "URL da API Gateway"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
