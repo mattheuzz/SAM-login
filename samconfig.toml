@@ -3,7 +3,7 @@
 version = 0.1
 
 [default.global.parameters]
-stack_name = "back-dnd"
+stack_name = "sam-login"
 
 [default.build.parameters]
 cached = true
@@ -16,7 +16,7 @@ lint = true
 capabilities = "CAPABILITY_IAM"
 confirm_changeset = true
 resolve_s3 = true
-s3_prefix = "back-dnd"
+s3_prefix = "sam-login"
 region = "us-east-1"
 parameter_overrides = "MongoUriParam=\"mongodb+srv://matheus:100891@cluster0.tmjhqkr.mongodb.net/\""
 image_repositories = []
